@@ -18,15 +18,16 @@
  */
 package leader;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.List;
+
 import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingServer;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.List;
 
 public class LeaderSelectorExample
 {
@@ -48,7 +49,8 @@ public class LeaderSelectorExample
         {
             for ( int i = 0; i < CLIENT_QTY; ++i )
             {
-                CuratorFramework    client = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(1000, 3));
+                CuratorFramework    client = CuratorFrameworkFactory.newClient("localhost:2181", new ExponentialBackoffRetry(1000, 3));
+                //CuratorFramework    client = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(1000, 3));
                 clients.add(client);
 
                 ExampleClient       example = new ExampleClient(client, PATH, "Client #" + i);

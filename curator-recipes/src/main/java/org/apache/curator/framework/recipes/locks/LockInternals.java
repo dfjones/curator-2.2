@@ -18,6 +18,15 @@
  */
 package org.apache.curator.framework.recipes.locks;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
@@ -26,20 +35,13 @@ import org.apache.curator.RetryLoop;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.api.CuratorWatcher;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
+import org.apache.curator.utils.PathUtils;
 import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
-import org.apache.curator.utils.PathUtils;
 import org.apache.zookeeper.data.Stat;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class LockInternals
 {
@@ -73,6 +75,8 @@ public class LockInternals
     private volatile int    maxLeases;
 
     static final byte[]             REVOKE_MESSAGE = "__REVOKE__".getBytes();
+
+    private static final Semaphore semaphore = new Semaphore(1);
 
     /**
      * Attempt to delete the lock node so that sequence numbers get reset
@@ -215,6 +219,10 @@ public class LockInternals
 
             try
             {
+                if (semaphore.tryAcquire()) {
+                  Thread.currentThread().interrupt();
+                }
+
                 if ( localLockNodeBytes != null )
                 {
                     ourPath = client.create().creatingParentsIfNeeded().withProtection().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(path, localLockNodeBytes);

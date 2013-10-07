@@ -18,13 +18,14 @@
  */
 package leader;
 
-import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
-import org.apache.curator.framework.recipes.leader.LeaderSelector;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.leader.LeaderSelector;
+import org.apache.curator.framework.recipes.leader.LeaderSelectorListenerAdapter;
 
 /**
  * An example leader selector client. Note that {@link LeaderSelectorListenerAdapter} which
